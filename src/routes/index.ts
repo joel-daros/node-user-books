@@ -1,16 +1,10 @@
-import User from '../controllers/users';
-import { Express } from 'express';
+import UserRoutes from './users.routes';
+import AuthRoutes from './auth.routes';
+import { Router } from 'express';
 
-export default (app: Express) => {
-  app.get('/api/users', (req, res) => User.getUsers(req, res));
+const routes = Router();
 
-  app.get('/api/users/:id', (req, res, next) => User.getUser(req, res, next));
+routes.use('/users', UserRoutes);
+routes.use('/auth', AuthRoutes);
 
-  app.post('/api/users', (req, res, next) => User.addUser(req, res, next));
-
-  app.patch('/api/users/:id', (req, res, next) => User.updateUser(req, res, next));
-  //
-  app.get('*', (req, res) => {
-    res.status(200).send({ message: 'Welcom to default API Route of my app' });
-  });
-};
+export default routes;

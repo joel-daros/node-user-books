@@ -43,6 +43,13 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
           data: {}
         });
         break;
+      case 'Generic':
+        res.status(err.statusCode).send({
+          message: err.message,
+          type: err.type,
+          data: err.data
+        });
+        break;
       default:
         res.status(400).send({
           message: err.message,

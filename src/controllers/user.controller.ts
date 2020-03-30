@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import UserModel from '../models/user.model';
+import { ValidationError } from 'objection';
 
 export default class User {
   static async getUsers(req: Request, res: Response) {
@@ -23,9 +24,41 @@ export default class User {
   }
 
   static async updateUser(req: Request, res: Response, next: NextFunction) {
+    const { oldPassword, passwordHash } = req.body;
+
+    if (passwordHash && !oldPassword) {
+      return next(
+        new ValidationError({
+          statusCode: 401,
+          type: 'Generic',
+          message: `Para trocar a senha é preciso informar a nova e a antiga`
+        })
+      );
+    }
+
+    // buscando dados atuais do usuário
+    let user;
+    try {
+      user = await UserModel.query()
+        .findById(res.locals.jwtPayload.id)
+        .first();
+    } catch (error) {
+      next(error);
+    }
+
+    // verificar se a oldPassword bate com a senha atual
+    if (passwordHash && !UserModel.checkPassword(oldPassword, user.passwordHash)) {
+      return next(
+        new ValidationError({ statusCode: 401, type: 'Generic', message: 'Senha antiga Inválida' })
+      );
+    }
+
+    // removendo a entrada temporária antes de fazer o patch
+    delete req.body.oldPassword;
+
     try {
       const numUpdated = await UserModel.query()
-        .findById(req.params.id)
+        .findById(res.locals.jwtPayload.id)
         .patch(req.body);
 
       res.status(200).send({ sucess: numUpdated });

@@ -4,7 +4,9 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 
 config({ path: resolve(__dirname, '../../.env') });
-console.log(process.env.NODE_ENV);
+
+console.log('NODE_ENV: ', process.env.NODE_ENV);
+
 export const knexConfig = {
   client: 'postgresql',
   connection: {
@@ -27,9 +29,5 @@ export const knexConfig = {
   },
   ...knexSnakeCaseMappers()
 } as Config;
-
-const environment = process.env.NODE_ENV || 'development';
-
-// console.log(knexConfig[environment]);
 
 export const knex = Knex(knexConfig as Config);

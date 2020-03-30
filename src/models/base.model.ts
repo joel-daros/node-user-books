@@ -1,7 +1,7 @@
-import { Model } from 'objection';
+import { Model, StaticHookArguments } from 'objection';
 import { v4 as uuidv4 } from 'uuid';
 
-export default class User extends Model {
+export default class Base extends Model {
   id!: string;
   createdAt: string;
   updatedAt: string;

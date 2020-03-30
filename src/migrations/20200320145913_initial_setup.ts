@@ -3,7 +3,11 @@ import * as Knex from 'knex';
 export async function up(knex: Knex): Promise<any> {
   return knex.schema
     .createTable('users', t => {
-      t.uuid('id').primary(), t.string('username'), t.string('email'), t.timestamps(true, true);
+      t.uuid('id').primary(),
+        t.string('username').unique(),
+        t.string('password_hash'),
+        t.string('email'),
+        t.timestamps(true, true);
     })
     .createTable('books', table => {
       table.uuid('id').primary(),
