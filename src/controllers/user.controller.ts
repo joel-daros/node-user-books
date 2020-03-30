@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import UserModel from '../models/user.model';
 import { ValidationError } from 'objection';
 
-export default class User {
+export default class UserController {
   static async getUsers(req: Request, res: Response) {
     const query = UserModel.query();
 
@@ -18,6 +18,26 @@ export default class User {
     try {
       const user = await UserModel.query().where('id', req.params.id);
       res.status(200).send(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async addUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const insertGraph = await UserModel.transaction(async trx => {
+        // verificar se o usuário já existe antes de fazer o insert
+        // const user = await UserModel.query(trx).findById(parseInt(req.body.id));
+
+        // if (!user) {
+        return UserModel.query(trx)
+          .allowGraph('books')
+          .insertGraph(req.body);
+        // } else {
+        //   res.status(400).send({ error: 'User already exists' });
+        // }
+      });
+      res.status(200).send(insertGraph);
     } catch (error) {
       next(error);
     }
@@ -47,7 +67,7 @@ export default class User {
     }
 
     // verificar se a oldPassword bate com a senha atual
-    if (passwordHash && !UserModel.checkPassword(oldPassword, user.passwordHash)) {
+    if (passwordHash && !user.checkPassword(user.passwordHash)) {
       return next(
         new ValidationError({ statusCode: 401, type: 'Generic', message: 'Senha antiga Inválida' })
       );
@@ -62,26 +82,6 @@ export default class User {
         .patch(req.body);
 
       res.status(200).send({ sucess: numUpdated });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async addUser(req: Request, res: Response, next: NextFunction) {
-    try {
-      const insertGraph = await UserModel.transaction(async trx => {
-        // verificar se o usuário já existe antes de fazer o insert
-        // const user = await UserModel.query(trx).findById(parseInt(req.body.id));
-
-        // if (!user) {
-        return UserModel.query(trx)
-          .allowGraph('books')
-          .insertGraph(req.body);
-        // } else {
-        //   res.status(400).send({ error: 'User already exists' });
-        // }
-      });
-      res.status(200).send(insertGraph);
     } catch (error) {
       next(error);
     }

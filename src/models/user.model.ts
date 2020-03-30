@@ -1,9 +1,9 @@
 import { Model } from 'objection';
-import Books from './books.model';
+import BooksModel from './books.model';
 import BaseModel from './base.model';
 import bcrypt from 'bcryptjs';
 
-export default class User extends BaseModel {
+export default class UserModel extends BaseModel {
   static tableName = 'users';
 
   static jsonSchema = {
@@ -25,7 +25,7 @@ export default class User extends BaseModel {
   static relationMappings = () => ({
     books: {
       relation: Model.HasManyRelation,
-      modelClass: Books,
+      modelClass: BooksModel,
       join: {
         from: 'users.id',
         to: 'books.userId'
@@ -34,8 +34,8 @@ export default class User extends BaseModel {
   });
 
   // verifica se a senha do usuário bate com a salva no banco
-  static checkPassword(password: string, passwordHash: string) {
-    return bcrypt.compareSync(password, passwordHash);
+  checkPassword(password: string) {
+    return bcrypt.compareSync(password, this.passwordHash);
   }
 
   async $beforeInsert() {

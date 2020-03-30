@@ -1,8 +1,8 @@
 import { Model } from 'objection';
-import User from './user.model';
+import UserModel from './user.model';
 import BaseModel from './base.model';
 
-export default class Books extends BaseModel {
+export default class BooksModel extends BaseModel {
   static tableName = 'books';
   bookName: string;
   userId: number;
@@ -10,7 +10,7 @@ export default class Books extends BaseModel {
   static relationMappings = () => ({
     user: {
       relation: Model.BelongsToOneRelation,
-      modelClass: User,
+      modelClass: UserModel,
       join: {
         from: 'books.userId',
         to: 'users.id'

@@ -1,15 +1,15 @@
-import User from '../controllers/user.controller';
+import UserController from '../controllers/user.controller';
 import { Router } from 'express';
 import { authHandler } from '../midlewares/auth.handler';
 
 const routes = Router();
 
-routes.get('/', authHandler, User.getUsers);
+routes.get('/', authHandler, UserController.getUsers);
 
-routes.get('/:id', authHandler, User.getUser);
+routes.get('/:id', authHandler, UserController.getUser);
 
-routes.post('/', authHandler, User.addUser);
+routes.post('/', authHandler, UserController.addUser);
 
-routes.patch('/', authHandler, User.updateUser);
+routes.patch('/', authHandler, UserController.updateUser);
 
 export default routes;

@@ -3,17 +3,18 @@ import { ValidationError } from 'objection';
 import UserModel from '../models/user.model';
 import jwt from 'jsonwebtoken';
 
-export default class Auth {
+export default class AuthController {
   static async login(req: Request, res: Response, next: NextFunction) {
-    const { username, passwordHash } = req.body;
+    const { username, password } = req.body;
 
     // checando se o login e a senha estão preenchidos
-    if (!(username && passwordHash)) {
+    if (!(username && password)) {
       res.status(400).send();
     }
 
     // validando se o usuário existe
     let user: UserModel;
+
     try {
       user = await UserModel.query()
         .where('username', username)
@@ -35,7 +36,7 @@ export default class Auth {
     }
 
     // validando se a senha está correta
-    if (!UserModel.checkPassword(passwordHash, user.passwordHash)) {
+    if (!user.checkPassword(password)) {
       return next(
         new ValidationError({ statusCode: 401, type: 'Generic', message: 'Senha Inválida' })
       );
